@@ -14,6 +14,7 @@ app.use(express.static(path.join(__dirname, "public")))
 //call api middleware
 app.use('/auth', authApi)
 
-//errorhandling middlewatre
+//errorhandling middleware
 app.use('/', errorHandler)
+
 module.exports = app
