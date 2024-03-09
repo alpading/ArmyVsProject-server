@@ -58,7 +58,7 @@ router.put('/', adminAuth, elemImageUploader, async (req, res, next) => {
 	let conn = null
 	
 	try {
-		validate(elemId, "id").input().isNumber()
+		validate(elemId, "elemId").input().isNumber()
 		validate(type, "type").input().isNumber()
 		validate(name, "name").input()
 		
@@ -86,6 +86,42 @@ router.put('/', adminAuth, elemImageUploader, async (req, res, next) => {
 								id = $2`
 		const updateElemImageParams = [image, elemId]
 		if(req.file) await pool.query(updateElemImageQuery, updateElemImageParams)
+		
+		await conn.query("COMMIT")
+	} catch(error) {
+		if(conn) await conn.query("ROLLBACK")
+		return next(error)
+	} finally {
+		if(conn) conn.release
+	}
+	
+	res.send(result.data)
+})
+
+// 요소 삭제 (softdelete)
+router.delete('/', adminAuth, async (req, res, next) => {
+	const { elemId } = req.body
+	const result = {
+		data : {},
+		message : ""
+	}
+	
+	let conn = null
+	
+	try {
+		validate(elemId, "elemId").input().isNumber()
+		
+		const conn = await pool.connect()
+		await conn.query("BEGIN")
+		
+		const deleteElemQuery = `UPDATE
+									elem 
+								SET
+									is_deleted = true
+								WHERE
+									id = $1`
+		const deleteElemParams = [elemId]
+		const deleteElemResult = await pool.query(deleteElemQuery, deleteElemParams)
 		
 		await conn.query("COMMIT")
 	} catch(error) {
