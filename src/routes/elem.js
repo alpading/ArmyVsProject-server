@@ -46,7 +46,6 @@ router.post('/', adminAuth, elemImageUploader, async (req, res, next) => {
 	res.send(result.data)
 })
 
-
 // 요소 수정
 router.put('/', adminAuth, elemImageUploader, async (req, res, next) => {
 	const { elemId, type, name } = req.body
@@ -134,5 +133,93 @@ router.delete('/', adminAuth, async (req, res, next) => {
 	res.send(result.data)
 })
 
+// 요소 조회
+router.get('/:elemId', async (req, res, next) => {
+	const { elemId } = req.params
+	const result = {
+		data : {},
+		message : ""
+	}
+	
+	let conn = null
+	
+	try {
+		validate(elemId, "elemId").input().isNumber()
+		
+		const conn = await pool.connect()
+		await conn.query("BEGIN")
+		
+		const selectElemQuery = `SELECT
+									type,
+									name,
+									image,
+									selected_count,
+									unselected_count,
+									created_at
+								FROM
+									elem 
+								WHERE
+									id = $1 
+								AND 
+									is_deleted = false`
+		const selectElemParams = [elemId]
+		const selectElemResult = await pool.query(selectElemQuery, selectElemParams)
+		
+		result.data = selectElemResult.rows[0]
+		
+		await conn.query("COMMIT")
+	} catch(error) {
+		if(conn) await conn.query("ROLLBACK")
+		return next(error)
+	} finally {
+		if(conn) conn.release
+	}
+	
+	res.send(result.data)
+})
+
+// 요소 목록 조회
+router.get('/list/:type', async (req, res, next) => {
+	const { type } = req.params
+	const result = {
+		data : {},
+		message : ""
+	}
+	
+	let conn = null
+	
+	try {
+		validate(type, "type").input().isNumber()
+		
+		const conn = await pool.connect()
+		await conn.query("BEGIN")
+		
+		const selectElemListQuery = `SELECT
+									id,
+									name,
+									selected_count,
+									unselected_count
+								FROM
+									elem 
+								WHERE
+									type = $1 
+								AND 
+									is_deleted = false
+								ORDER BY created_at`
+		const selectElemListParams = [type]
+		const selectElemListResult = await pool.query(selectElemListQuery, selectElemListParams)
+		
+		result.data = selectElemListResult.rows
+		
+		await conn.query("COMMIT")
+	} catch(error) {
+		if(conn) await conn.query("ROLLBACK")
+		return next(error)
+	} finally {
+		if(conn) conn.release
+	}
+	
+	res.send(result.data)
+})
 
 module.exports = router
