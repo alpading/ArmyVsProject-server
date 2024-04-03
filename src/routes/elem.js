@@ -31,9 +31,19 @@ router.post('/', adminAuth, elemImageUploader, async (req, res, next) => {
 		const insertElemQuery = `INSERT INTO 
 									elem (type, name, image)
 								VALUES
-									($1, $2, $3)`
+									($1, $2, $3)
+								RETURNING
+									id`
 		const insertElemParams = [type, name, image]
-		await pool.query(insertElemQuery, insertElemParams)
+		const insertElemResult = await pool.query(insertElemQuery, insertElemParams)
+		
+		//선택 결과 저장을 위한 매핑 테이블인 selected_elem에 요소 추가
+		const insertSelectedElemQuery = `INSERT INTO
+											selected_elem (elem_id)
+										VALUES
+											($1)`
+		const insertSelectedElemParams = [insertElemResult.rows[0].id]
+		await pool.query(insertSelectedElemQuery, insertSelectedElemParams)
 		
 		await conn.query("COMMIT")
 	} catch(error) {
