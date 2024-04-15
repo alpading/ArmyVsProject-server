@@ -205,17 +205,17 @@ router.get('/list/:type', async (req, res, next) => {
 		await conn.query("BEGIN")
 		
 		const selectElemListQuery = `SELECT
-									id,
-									name,
-									selected_count,
-									unselected_count
-								FROM
-									elem 
-								WHERE
-									type = $1 
-								AND 
-									is_deleted = false
-								ORDER BY created_at`
+										id,
+										name,
+										selected_count,
+										unselected_count
+									FROM
+										elem 
+									WHERE
+										type = $1 
+									AND 
+										is_deleted = false
+									ORDER BY created_at`
 		const selectElemListParams = [type]
 		const selectElemListResult = await pool.query(selectElemListQuery, selectElemListParams)
 		
@@ -232,4 +232,53 @@ router.get('/list/:type', async (req, res, next) => {
 	res.send(result.data)
 })
 
+// 질문 생성 -> 랜덤으로 2개 요소 추출
+router.get("/:type/question", async (req, res, next) => {
+	const { type } = req.params
+    const result = {
+        message: "",
+        data: {}
+    }
+
+    let conn = null
+
+    try {
+		validate(type, "type").input().isNumber()
+		
+        conn = await pool.connect()
+        await conn.query("BEGIN")
+
+        const selectRandomElemSql = `SELECT
+										id,
+										name,
+										image
+									FROM
+										elem
+									WHERE
+										is_deleted = false
+									AND
+										type = $1
+									ORDER BY
+										RANDOM()
+									LIMIT
+										2`
+        const selectRandomElemParams = [type]
+        const selectRandomElemResult = await conn.query(selectRandomElemSql, selectRandomElemParams)
+		
+		if(selectRandomElemResult.rowCount != 2) throw new BadRequest("잘못된 타입입니다")
+		
+		result.data = selectRandomElemResult.rows
+		
+        await conn.query("COMMIT")
+    } catch(error) {
+        if(conn) {
+            await conn.query("ROLLBACK")
+        }
+        return next(error)
+    } finally {
+        if(conn) conn.release
+        res.send(result)
+    }
+})
+		   
 module.exports = router
