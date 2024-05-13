@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser")
 
 const authApi = require('./routes/auth')
 const elemApi = require('./routes/elem')
+const selectionApi = require('./routes/selection')
 
 const errorHandler = require('./middleware/errorHandler')
 
@@ -16,6 +17,7 @@ app.use(cookieParser())
 //call api middleware
 app.use('/auth', authApi)
 app.use('/elem', elemApi)
+app.use('/selection', selectionApi)
 
 //errorhandling middleware
 app.use('/', errorHandler)
