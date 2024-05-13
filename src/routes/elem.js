@@ -271,9 +271,52 @@ router.get("/:type/question", async (req, res, next) => {
 		
         await conn.query("COMMIT")
     } catch(error) {
-        if(conn) {
-            await conn.query("ROLLBACK")
-        }
+        if(conn) await conn.query("ROLLBACK")
+        return next(error)
+    } finally {
+        if(conn) conn.release
+        res.send(result)
+    }
+})
+
+// 요소 중 승률 높은 순으로 조회
+router.get("/:type/list/ranking", async (req, res, next) => {
+	const { type } = req.params
+    const result = {
+        message: "",
+        data: {}
+    }
+
+    let conn = null
+
+    try {
+		validate(type, "type").input().isNumber()
+		
+        conn = await pool.connect()
+        await conn.query("BEGIN")
+		
+		const selectElemByRankQuery = `SELECT
+											id, name, image, selected_count, unselected_count,
+											CAST(100 AS FLOAT4) * selected_count / (selected_count + unselected_count) AS rate
+										FROM
+											elem
+										WHERE
+											type = $1
+										AND
+											is_deleted = false
+										AND
+											selected_count + unselected_count != 0
+										ORDER BY
+											rate
+										DESC`
+		const selectElemByRankParams = [type]
+		const selectElemByRankResult = await conn.query(selectElemByRankQuery, selectElemByRankParams)
+		
+		result.data = selectElemByRankResult.rows
+		
+        await conn.query("COMMIT")
+    } catch(error) {
+        if(conn) await conn.query("ROLLBACK")
         return next(error)
     } finally {
         if(conn) conn.release
