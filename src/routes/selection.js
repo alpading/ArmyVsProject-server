@@ -28,9 +28,9 @@ router.post('/', async (req, res, next) => {
 								WHERE
 									id = $1
 								AND
-									type = (
+									type_id = (
 										SELECT
-											type
+											type_id
 										FROM
 											elem
 										WHERE
