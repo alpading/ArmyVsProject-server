@@ -6,6 +6,7 @@ const cookieParser = require("cookie-parser")
 const authApi = require('./routes/auth')
 const elemApi = require('./routes/elem')
 const selectionApi = require('./routes/selection')
+const genreApi = require('./routes/genre')
 
 const errorHandler = require('./middleware/errorHandler')
 
@@ -18,6 +19,7 @@ app.use(cookieParser())
 app.use('/auth', authApi)
 app.use('/elem', elemApi)
 app.use('/selection', selectionApi)
+app.use('/genre', genreApi)
 
 //errorhandling middleware
 app.use('/', errorHandler)
