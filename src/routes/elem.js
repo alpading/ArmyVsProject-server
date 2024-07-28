@@ -29,7 +29,7 @@ router.post('/', adminAuth, elemImageUploader, async (req, res, next) => {
 		await conn.query("BEGIN")
 		
 		const insertElemQuery = `INSERT INTO 
-									elem (type, name, image)
+									elem (type_id, name, image)
 								VALUES
 									($1, $2, $3)
 								RETURNING
@@ -77,7 +77,7 @@ router.put('/', adminAuth, elemImageUploader, async (req, res, next) => {
 		const updateElemQuery = `UPDATE
 									elem 
 								SET
-									type = $1,
+									type_id = $1,
 									name = $2
 								WHERE
 									id = $3`
@@ -160,7 +160,7 @@ router.get('/:elemId', async (req, res, next) => {
 		await conn.query("BEGIN")
 		
 		const selectElemQuery = `SELECT
-									type,
+									type_id,
 									name,
 									image,
 									selected_count,
@@ -212,7 +212,7 @@ router.get('/list/:type', async (req, res, next) => {
 									FROM
 										elem 
 									WHERE
-										type = $1 
+										type_id = $1 
 									AND 
 										is_deleted = false
 									ORDER BY created_at`
@@ -257,7 +257,7 @@ router.get("/:type/question", async (req, res, next) => {
 									WHERE
 										is_deleted = false
 									AND
-										type = $1
+										type_id = $1
 									ORDER BY
 										RANDOM()
 									LIMIT
@@ -301,7 +301,7 @@ router.get("/:type/list/ranking", async (req, res, next) => {
 										FROM
 											elem
 										WHERE
-											type = $1
+											type_id = $1
 										AND
 											is_deleted = false
 										AND
