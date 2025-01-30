@@ -3,10 +3,10 @@ const pool = require('../config/database/postgresql/postgresql')
 const { BadRequest } = require('../module/customError')
 const validate = require('../module/validation')
 const adminAuth = require('../middleware/adminAuth')
-const elemImageUploader = require('../middleware/imageUploader')
+/*const elemImageUploader = require('../middleware/imageUploader')*/
 
 //새로운 요소 등록
-router.post('/', adminAuth, elemImageUploader, async (req, res, next) => {
+router.post('/', adminAuth, /*elemImageUploader,*/ async (req, res, next) => {
 	const { type, name } = req.body
 	const result = {
 		data : {},
@@ -57,7 +57,7 @@ router.post('/', adminAuth, elemImageUploader, async (req, res, next) => {
 })
 
 // 요소 수정
-router.put('/', adminAuth, elemImageUploader, async (req, res, next) => {
+router.put('/', adminAuth, /*elemImageUploader,*/ async (req, res, next) => {
 	const { elemId, type, name } = req.body
 	const result = {
 		data : {},
@@ -189,6 +189,7 @@ router.get('/:elemId', async (req, res, next) => {
 })
 
 // 요소 목록 조회
+/*
 router.get('/list/:type', async (req, res, next) => {
 	const { type } = req.params
 	const result = {
@@ -231,6 +232,7 @@ router.get('/list/:type', async (req, res, next) => {
 	
 	res.send(result.data)
 })
+*/
 
 // 질문 생성 -> 랜덤으로 2개 요소 추출
 router.get("/:type/question", async (req, res, next) => {
@@ -323,5 +325,50 @@ router.get("/:type/list/ranking", async (req, res, next) => {
         res.send(result)
     }
 })
-		   
+
+// 11개 요소 랜덤 조회
+router.get('/list/:type', async (req, res, next) => {
+	const { type } = req.params
+	const result = {
+		data : {},
+		message : ""
+	}
+	
+	let conn = null
+	
+	try {
+		validate(type, "type").input().isNumber()
+		
+		const conn = await pool.connect()
+		await conn.query("BEGIN")
+		
+		const selectRandomElemListQuery = `SELECT
+										id,
+										name,
+									FROM
+										elem 
+									WHERE
+										type_id = $1 
+									AND 
+										is_deleted = false
+									ORDER BY 
+										RANDOM()
+									LIMIT
+										5`
+		const selectRandomElemListParams = [type]
+		const selectRandomElemListResult = await pool.query(selectRandomElemListQuery, selectRandomElemListParams)
+		
+		result.data = selectRandomElemListResult.rows
+		
+		await conn.query("COMMIT")
+	} catch(error) {
+		if(conn) await conn.query("ROLLBACK")
+		return next(error)
+	} finally {
+		if(conn) conn.release
+	}
+	
+	res.send(result.data)
+})
+
 module.exports = router
