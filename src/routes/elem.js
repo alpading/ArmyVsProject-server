@@ -354,7 +354,7 @@ router.get('/list/:type', async (req, res, next) => {
 									ORDER BY 
 										RANDOM()
 									LIMIT
-										5`
+										11`
 		const selectRandomElemListParams = [type]
 		const selectRandomElemListResult = await pool.query(selectRandomElemListQuery, selectRandomElemListParams)
 		
