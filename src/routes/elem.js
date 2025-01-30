@@ -344,7 +344,7 @@ router.get('/list/:type', async (req, res, next) => {
 		
 		const selectRandomElemListQuery = `SELECT
 										id,
-										name,
+										name
 									FROM
 										elem 
 									WHERE
