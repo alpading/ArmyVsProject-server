@@ -3,10 +3,9 @@ const pool = require('../config/database/postgresql/postgresql')
 const { BadRequest } = require('../module/customError')
 const validate = require('../module/validation')
 const adminAuth = require('../middleware/adminAuth')
-/*const elemImageUploader = require('../middleware/imageUploader')*/
 
 //새로운 요소 등록
-router.post('/', adminAuth, /*elemImageUploader,*/ async (req, res, next) => {
+router.post('/', adminAuth, async (req, res, next) => {
 	const { type, name } = req.body
 	const result = {
 		data : {},
@@ -23,18 +22,16 @@ router.post('/', adminAuth, /*elemImageUploader,*/ async (req, res, next) => {
 			throw new BadRequest("이미지가 없습니다.")
 		}
 		
-		const image = req.file.location
-		
 		const conn = await pool.connect()
 		await conn.query("BEGIN")
 		
 		const insertElemQuery = `INSERT INTO 
-									elem (type_id, name, image)
+									elem (type_id, name)
 								VALUES
-									($1, $2, $3)
+									($1, $2)
 								RETURNING
 									id`
-		const insertElemParams = [type, name, image]
+		const insertElemParams = [type, name]
 		const insertElemResult = await pool.query(insertElemQuery, insertElemParams)
 		
 		//선택 결과 저장을 위한 매핑 테이블인 selected_elem에 요소 추가
@@ -57,7 +54,7 @@ router.post('/', adminAuth, /*elemImageUploader,*/ async (req, res, next) => {
 })
 
 // 요소 수정
-router.put('/', adminAuth, /*elemImageUploader,*/ async (req, res, next) => {
+router.put('/', adminAuth, async (req, res, next) => {
 	const { elemId, type, name } = req.body
 	const result = {
 		data : {},
@@ -83,18 +80,6 @@ router.put('/', adminAuth, /*elemImageUploader,*/ async (req, res, next) => {
 									id = $3`
 		const updateElemParams = [type, name, elemId]
 		const updateElemResult = await pool.query(updateElemQuery, updateElemParams)
-		
-		let image
-		if(req.file) image = req.file.location
-
-		const updateElemImageQuery = `UPDATE
-									elem 
-								SET
-									image = $1
-								WHERE
-								id = $2`
-		const updateElemImageParams = [image, elemId]
-		if(req.file) await pool.query(updateElemImageQuery, updateElemImageParams)
 		
 		await conn.query("COMMIT")
 	} catch(error) {
@@ -162,7 +147,6 @@ router.get('/:elemId', async (req, res, next) => {
 		const selectElemQuery = `SELECT
 									type_id,
 									name,
-									image,
 									selected_count,
 									unselected_count,
 									created_at
@@ -298,7 +282,7 @@ router.get("/:type/list/ranking", async (req, res, next) => {
         await conn.query("BEGIN")
 		
 		const selectElemByRankQuery = `SELECT
-											id, name, image, selected_count, unselected_count,
+											id, name, selected_count, unselected_count,
 											CAST(100 AS FLOAT4) * selected_count / (selected_count + unselected_count) AS rate
 										FROM
 											elem
