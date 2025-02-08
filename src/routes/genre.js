@@ -3,6 +3,7 @@ const pool = require('../config/database/postgresql/postgresql')
 const jwtSign = require('../module/jwt')
 const { BadRequest } = require('../module/customError')
 const validate = require('../module/validation')
+const adminAuth = require('../middleware/adminAuth')
 
 // 장르 추가
 router.post('/', adminAuth, async (req, res, next) => {
