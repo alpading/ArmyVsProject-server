@@ -62,34 +62,14 @@ router.post('/', async (req, res, next) => {
 		const insertSelectionParams = [unselected_elem_id, selected_elem_id]
 		const insertSelectionResult = await conn.query(insertSelectionQuery, insertSelectionParams)
 		
-		// 선택된 요소에 selected_count + 1
-		const updateSelectedCountQuery = `UPDATE
-												elem
-											SET
-												selected_count = selected_count + 1
-											WHERE
-												id = $1`
-		const updateSelectedCountParams = [selected_elem_id]
-		const updateSelectedCountReuslt = await conn.query(updateSelectedCountQuery, updateSelectedCountParams)
-		
-		// 선택되지 않은 요소에 unselected_count - 1
-		const updateUnselectedCountQuery = `UPDATE
-												elem
-											SET
-												unselected_count = unselected_count + 1
-											WHERE
-												id = $1`
-		const updateUnselectedCountParams = [unselected_elem_id]
-		const updateUnselectedCountReuslt = await conn.query(updateUnselectedCountQuery, updateUnselectedCountParams)
-		
 		await conn.query("COMMIT")
+		await conn.release()
 	} catch(error) {
 		if(conn) await conn.query("ROLLBACK")
+		await conn.release()
 		return next(error)
-	} finally {
-		if(conn) conn.release
-		 res.send(result)
 	}
+	res.send(result.data)
 })
 
 //특정 질문에 대한 답변 통계 반환
@@ -133,18 +113,18 @@ router.get('/stat/:elemId1/:elemId2', async (req, res, next) => {
 		const selectElem2CountResult = await conn.query(selectCountQuery, selectElem2CountParams)
 		
 		result.data = {
-			"elem1Count" : selectElem1CountResult.rows[0].count,
-			"elem2Count" : selectElem2CountResult.rows[0].count
+			"selectedElemCount" : selectElem1CountResult.rows[0].count,
+			"unselectedElemCount" : selectElem2CountResult.rows[0].count
 		}
 		
 		await conn.query("COMMIT")
+		await conn.release()
 	} catch(error) {
 		if(conn) await conn.query("ROLLBACK")
+		await conn.release()
 		return next(error)
-	} finally {
-		if(conn) conn.release
-		 res.send(result)
 	}
+	res.send(result.data)
 })
 
 module.exports = router
