@@ -5,11 +5,4 @@ class BadRequest extends Error {
 	}
 }
 
-class Unauthorized extends Error {
-	constructor(message) {
-		super(message)
-		this.status = 401
-	}
-}
-
-module.exports = { BadRequest, Unauthorized }
+module.exports = { BadRequest }

@@ -1,7 +1,7 @@
 const errorHandler = () => {
 	return (error, req, res, next) => {
-		// console.log(error)
-		// res.send(error.message)
+		console.log(error)
+		res.send(error.message)
 	}
 }
 

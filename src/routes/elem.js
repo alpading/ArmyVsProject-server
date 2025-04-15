@@ -1,6 +1,5 @@
 const router = require('express').Router()
 const pool = require('../config/database/postgresql/postgresql')
-const { BadRequest } = require('../module/customError')
 const validate = require('../module/validation')
 
 // 요소 조회
