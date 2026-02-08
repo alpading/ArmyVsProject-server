@@ -1,235 +1,123 @@
 const router = require('express').Router()
 const pool = require('../config/database/postgresql/postgresql')
 const validate = require('../module/validation')
+const asyncHandler  = require('../middleware/asyncHandler')
+const { NotFound } = require('../module/customError')
 
 // 요소 조회
-router.get('/:elemId', async (req, res, next) => {
+router.get('/:elemId', asyncHandler( async(req, res) => {
 	const { elemId } = req.params
-	const result = {
-		data : {},
-		message : ""
-	}
 	
-	let conn = null
-	
-	try {
-		validate(elemId, "elemId").input().isNumber()
-		
-		const conn = await pool.connect()
-		await conn.query("BEGIN")
-		
-		const selectElemQuery = `SELECT
-									type_id,
-									name,
-									win_count,
-									created_at
-								FROM
-									elem 
-								WHERE
-									id = $1 
-								AND 
-									is_deleted = false`
-		const selectElemParams = [elemId]
-		const selectElemResult = await pool.query(selectElemQuery, selectElemParams)
-		
-		result.data = selectElemResult.rows[0]
-		
-		await conn.query("COMMIT")
-		await conn.release()
-	} catch(error) {
-		if(conn) await conn.query("ROLLBACK")
-		await conn.release()
-		return next(error)
-	}
-	
-	res.send(result.data)
-})
+    validate(elemId, "elemId").number()
+    
+    const selectElemQuery = `
+        SELECT
+            type_id, name, win_count, created_at
+        FROM
+            elem 
+        WHERE
+            id = $1 
+            AND 
+            is_deleted = false`
+    const selectElemParams = [elemId]
+    const selectElemResult = await pool.query(selectElemQuery, selectElemParams)
 
-// 질문 생성 -> 랜덤으로 2개 요소 추출
-router.get("/:type/question", async (req, res, next) => {
-	const { type } = req.params
-    const result = {
-        message: "",
-        data: {}
-    }
-
-    let conn = null
-
-    try {
-		validate(type, "type").input().isNumber()
+    if(!selectElemResult.rows[0]) throw new NotFound()
 		
-        conn = await pool.connect()
-        await conn.query("BEGIN")
-
-        const selectRandomElemSql = `SELECT
-										id,
-										name,
-										image
-									FROM
-										elem
-									WHERE
-										is_deleted = false
-									AND
-										type_id = $1
-									ORDER BY
-										RANDOM()
-									LIMIT
-										2`
-        const selectRandomElemParams = [type]
-        const selectRandomElemResult = await conn.query(selectRandomElemSql, selectRandomElemParams)
-		
-		if(selectRandomElemResult.rowCount != 2) throw new BadRequest("잘못된 타입입니다")
-		
-		result.data = selectRandomElemResult.rows
-		
-        await conn.query("COMMIT")
-		await conn.release()
-    } catch(error) {
-        if(conn) await conn.query("ROLLBACK")
-		await conn.release()
-        return next(error)
-    }
-	
-	res.send(result)
-})
+	res.status(200).json({ data : selectElemResult.rows[0] })
+}))
 
 // 요소 중 승률 높은 순으로 조회
-router.get("/:type/list/ranking", async (req, res, next) => {
+router.get("/:type/list/ranking", asyncHandler ( async (req, res) => {
 	const { type } = req.params
-    const result = {
-        message: "",
-        data: {}
-    }
 
-    let conn = null
+    validate(type, "type").number()
+    
+    const selectElemByRankQuery = `
+        SELECT
+            id, name, win_count
+        FROM
+            elem
+        WHERE
+            type_id = $1
+        AND
+            is_deleted = false
+        ORDER BY
+            win_count
+        DESC`
+    const selectElemByRankParams = [type]
+    const selectElemByRankResult = await pool.query(selectElemByRankQuery, selectElemByRankParams)
 
-    try {
-		validate(type, "type").input().isNumber()
-		
-        conn = await pool.connect()
-        await conn.query("BEGIN")
-		
-		const selectElemByRankQuery = `SELECT
-											id, name, win_count
-										FROM
-											elem
-										WHERE
-											type_id = $1
-										AND
-											is_deleted = false
-										ORDER BY
-											win_count
-										DESC`
-		const selectElemByRankParams = [type]
-		const selectElemByRankResult = await conn.query(selectElemByRankQuery, selectElemByRankParams)
-		
-		result.data = selectElemByRankResult.rows
-		
-        await conn.query("COMMIT")
-		await conn.release()
-    } catch(error) {
-        if(conn) await conn.query("ROLLBACK")
-		await conn.release()
-        return next(error)
-    }
+    if(!selectElemByRankResult.rows[0]) throw new NotFound()
 	
-	res.send(result)
-})
+	res.status(200).json({ data : selectElemByRankResult.rows})
+}))
 
 // 11개 요소 랜덤 조회
-router.get('/list/:type', async (req, res, next) => {
+router.get('/list/:type', asyncHandler ( async (req, res) => {
 	const { type } = req.params
-	const result = {
-		data : {},
-		message : ""
-	}
+
+    validate(type, "type").number()
+
+    const selectRandomElemListQuery = `
+    SELECT
+        id, name
+    FROM
+        elem 
+    WHERE
+        type_id = $1 
+        AND
+        is_deleted = false
+    ORDER BY 
+        RANDOM()
+    LIMIT
+        11`
+    const selectRandomElemListParams = [type]
+    const selectRandomElemListResult = await pool.query(selectRandomElemListQuery, selectRandomElemListParams)
+    
+    if (!selectRandomElemListResult.rows[0]) throw new NotFound()
 	
-	let conn = null
-	
-	try {
-		validate(type, "type").input().isNumber()
-		
-		const conn = await pool.connect()
-		await conn.query("BEGIN")
-		
-		const selectRandomElemListQuery = `SELECT
-										id,
-										name
-									FROM
-										elem 
-									WHERE
-										type_id = $1 
-									AND 
-										is_deleted = false
-									ORDER BY 
-										RANDOM()
-									LIMIT
-										11`
-		const selectRandomElemListParams = [type]
-		const selectRandomElemListResult = await pool.query(selectRandomElemListQuery, selectRandomElemListParams)
-		
-		result.data = selectRandomElemListResult.rows
-		
-		await conn.query("COMMIT")
-		await conn.release()
-	} catch(error) {
-		if(conn) await conn.query("ROLLBACK")
-		await conn.release()
-		return next(error)
-	}
-	
-	res.send(result.data)
-})
+	res.status(200).json({ data : selectRandomElemListResult.rows})
+}))
 
 // 요소 우승 횟수 추가
-router.put('/win', async (req, res, next) => {
+router.put('/win', asyncHandler( async (req, res) => {
 	const { elemId } = req.body
-	const result = {
-		data : {},
-		message : ""
-	}
-	
-	let conn = null
-	
-	try {
-		validate(elemId, "elemId").input().isNumber()
-		
-		const conn = await pool.connect()
-		await conn.query("BEGIN")
-		
-		const selectElemWinCountQuery = `SELECT
-										win_count
-									FROM
-										elem 
-									WHERE
-										id = $1 
-									AND 
-										is_deleted = false
-									`
-		const selectElemWinCountParams = [elemId]
-		const selectElemWinCountResult = await pool.query(selectElemWinCountQuery, selectElemWinCountParams)
-		const winCount = selectElemWinCountResult.rows[0].win_count
-		
-		const updateWinCountQuery = ` UPDATE
-										elem
-									SET
-										win_count = $1
-									WHERE
-										id = $2
-									AND
-										is_deleted = false
-									`
-		const updateWinCountParams = [winCount + 1,elemId]
-		const updateWinCountResult = await pool.query(updateWinCountQuery, updateWinCountParams)
-		
-		await conn.query("COMMIT")
-		await conn.release()
-	} catch(error) {
-		if(conn) await conn.query("ROLLBACK")
-		await conn.release()
-		return next(error)
-	}
-	res.send(result.data)
-})
+
+    validate(elemId, "elemId").required().number()
+    
+    const selectElemWinCountQuery = `
+        SELECT
+            win_count
+        FROM
+            elem 
+        WHERE
+            id = $1 
+            AND 
+            is_deleted = false
+                                `
+    const selectElemWinCountParams = [elemId]
+    const selectElemWinCountResult = await pool.query(selectElemWinCountQuery, selectElemWinCountParams)
+
+    if(!selectElemWinCountResult.rows[0]) throw new NotFound()
+        
+    const winCount = selectElemWinCountResult.rows[0].win_count
+    
+    const updateWinCountQuery = `
+    UPDATE
+        elem
+    SET
+        win_count = $1
+    WHERE
+        id = $2
+        AND
+        is_deleted = false`
+    const updateWinCountParams = [winCount + 1,elemId]
+    const updateWinCountResult = await pool.query(updateWinCountQuery, updateWinCountParams)
+
+    if(!updateWinCountResult.rowCount) throw new NotFound()
+
+	res.status(200).json({ data : null })
+}))
 
 module.exports = router
