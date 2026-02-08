@@ -1,15 +1,15 @@
 const ERROR_CODE = require('./errorCodes')
 
 class BadRequest extends Error {
-	constructor(code, message) {
-		super(message)
-		this.status = 400
+    constructor(code, message) {
+        super(message)
+        this.status = 400
         this.code = code
-	}
+    }
 }
 
 class NotFound extends Error {
-    constructor(){
+    constructor() {
         super('Resource not found')
         this.status = 404
         this.code = ERROR_CODE.RESOURCE_NOT_FOUND
@@ -17,7 +17,7 @@ class NotFound extends Error {
 }
 
 class InternalServerError extends Error {
-    constructor(message){
+    constructor(message) {
         //super('Internal server error')
         super(message)
         this.status = 500
