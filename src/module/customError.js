@@ -17,9 +17,8 @@ class NotFound extends Error {
 }
 
 class InternalServerError extends Error {
-    constructor(message) {
-        //super('Internal server error')
-        super(message)
+    constructor(err) {
+        super(err.message || 'Internal server error', { cause : err })
         this.status = 500
         this.code = ERROR_CODE.INTERNAL_SERVER_ERROR
     }

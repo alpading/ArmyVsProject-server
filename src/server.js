@@ -4,6 +4,7 @@ const path = require('path')
 const cookieParser = require('cookie-parser')
 const cors = require('cors')
 
+const { httpLogger } = require('./middleware/httpLogger')
 const elemApi = require('./routes/elem')
 const selectionApi = require('./routes/selection')
 const genreApi = require('./routes/genre')
@@ -17,6 +18,7 @@ app.use(
         origin: '*',
     })
 )
+app.use(httpLogger)
 app.use(express.json())
 app.use(express.static(path.join(__dirname, 'client/build/')))
 app.use(cookieParser())

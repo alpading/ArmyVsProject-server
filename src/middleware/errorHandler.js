@@ -1,15 +1,23 @@
 const { InternalServerError } = require('../module/customError')
 
 const errorHandler = () => {
-    return (error, req, res, next) => {
-        if (!error.status) {
-            error = new InternalServerError(error.message)
+    return (err, req, res, next) => {
+        if (!err.status) {
+            err = new InternalServerError(err)
         }
 
-        console.log(error)
+        const status = err.status
 
-        res.status(error.status).json({
-            error: { code: error.code, message: error.message },
+        if (status >= 500){
+            req.log.error({ err, code: err.code, status: status }, 'Unhandled error')
+        }
+
+        if (status >= 400 && status < 500){
+            req.log.warn({ code: err.code, status, message: err.message }, 'Handled error')
+        }
+
+        res.status(status).json({
+            error: { code: err.code, message: err.message },
         })
     }
 }
