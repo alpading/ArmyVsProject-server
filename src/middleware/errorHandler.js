@@ -8,16 +8,20 @@ const errorHandler = () => {
 
         const status = err.status
 
-        if (status >= 500){
+        if (status >= 500 && status != 503){
             req.log.error({ err, code: err.code, status: status }, 'Unhandled error')
+        }
+
+        if (status == 503){
+            req.log.warn({ code: err.code, status, message: err.message}, 'Service unavailable')
         }
 
         if (status >= 400 && status < 500){
             req.log.warn({ code: err.code, status, message: err.message }, 'Handled error')
         }
 
-        res.status(status).json({
-            error: { code: err.code, message: err.message },
+        return res.status(status).json({
+            error: { code: err.code, message: err.message }
         })
     }
 }

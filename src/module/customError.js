@@ -24,4 +24,12 @@ class InternalServerError extends Error {
     }
 }
 
-module.exports = { BadRequest, NotFound, InternalServerError }
+class ServiceUnavailable extends Error {
+    constructor(code, message, cause) {
+        super(message, { cause })
+        this.status = 503
+        this.code = code
+    }
+}
+
+module.exports = { BadRequest, NotFound, InternalServerError, ServiceUnavailable }

@@ -13,8 +13,9 @@ const httpLogger = pinoHttp({
     logger,
     genReqId,
     customLogLevel(req, res, err){
-        if (err || res.statusCode >= 500) return 'error'
-        else if (res.statusCode >= 400) return 'warn'
+        if (res.statusCode === 503) return 'warn'
+        if (res.statusCode >= 500) return 'error'
+        if (res.statusCode >= 400) return 'warn'
         return 'info'
     },
     serializers: {

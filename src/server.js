@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser')
 const cors = require('cors')
 
 const { httpLogger } = require('./middleware/httpLogger')
+const healthApi = require('./routes/health')
 const elemApi = require('./routes/elem')
 const selectionApi = require('./routes/selection')
 const genreApi = require('./routes/genre')
@@ -25,6 +26,7 @@ app.use(express.static(path.join(__dirname, 'client/build/')))
 app.use(cookieParser())
 
 //call api middleware
+app.use('/', healthApi)
 app.use('/api/elem', elemApi)
 app.use('/api/selection', selectionApi)
 app.use('/api/genre', genreApi)
