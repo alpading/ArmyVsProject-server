@@ -10,6 +10,7 @@ const selectionApi = require('./routes/selection')
 const genreApi = require('./routes/genre')
 
 const errorHandler = require('./middleware/errorHandler')
+const { NotFound } = require('./module/customError')
 const ERROR_CODE = require('./module/errorCodes')
 
 //global middleware
@@ -29,10 +30,8 @@ app.use('/api/selection', selectionApi)
 app.use('/api/genre', genreApi)
 
 //invalid api route
-app.use('/api', (req, res) => {
-    res.status(404).json({
-        error: { code: ERROR_CODE.ROUTE_NOT_FOUND, message: 'Invalid Api route' },
-    })
+app.use('/api', (req, res, next) => {
+    next(new NotFound(ERROR_CODE.ROUTE_NOT_FOUND, 'Invalid Api route'))
 })
 
 app.get('*', (req, res) => {

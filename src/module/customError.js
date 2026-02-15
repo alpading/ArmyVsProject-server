@@ -9,10 +9,10 @@ class BadRequest extends Error {
 }
 
 class NotFound extends Error {
-    constructor() {
-        super('Resource not found')
+    constructor(code = ERROR_CODE.RESOURCE_NOT_FOUND, message = 'Resource not found') {
+        super(message)
         this.status = 404
-        this.code = ERROR_CODE.RESOURCE_NOT_FOUND
+        this.code = code
     }
 }
 
