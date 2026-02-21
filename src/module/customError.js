@@ -32,4 +32,17 @@ class ServiceUnavailable extends Error {
     }
 }
 
-module.exports = { BadRequest, NotFound, InternalServerError, ServiceUnavailable }
+class ConfigurationError extends Error {
+    constructor(code, message){
+        super(message)
+        this.code = code
+    }
+}
+
+module.exports = {
+    BadRequest,
+    NotFound,
+    InternalServerError,
+    ServiceUnavailable,
+    ConfigurationError
+}

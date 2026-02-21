@@ -1,10 +1,11 @@
 const pino = require('pino')
+const env = require('../config/env')
 
-const isDev = process.env.NODE_ENV === 'dev'
+const isDev = env.NODE_ENV === 'development'
 
 const logger = pino(
     { 
-        level : process.env.LOG_LEVEL
+        level : env.LOG_LEVEL
     }, 
     isDev
         ? pino.transport({ // for dev
