@@ -1,4 +1,3 @@
-require('dotenv').config()
 const { ConfigurationError } = require('../module/customError')
 const ERROR_CODE = require('../module/errorCodes')
 
