@@ -1,0 +1,22 @@
+.elemStat__background {
+	display: flex;
+	flex-direction: column-reverse;
+	width : 100%;
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	border: 2px solid none;
+	border-radius: 5px;
+}
+
+.elemStat__background_selected {
+	color: var(--red-color);
+	background-color:var(--primary-color);
+	font-size: 65px;
+}
+
+.elemStat__background_unselected {
+	color: var(--green-color);
+	background-color:var(--secondary-color);
+	font-size: 65px;
+}

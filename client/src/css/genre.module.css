@@ -1,0 +1,14 @@
+.genre{
+	font-size: 20px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 60px;
+	margin: 10px 0px;
+	background-color: var(--secondary-color);
+	border: 2px solid black;
+	border-radius: 10px;
+	width: 100%;
+}
+.genre__name{
+}

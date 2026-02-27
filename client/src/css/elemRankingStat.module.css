@@ -1,0 +1,97 @@
+.elemRankingStat {
+	font-size: 22px;
+	width : 80%;
+	height : 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	background-color : var(--secondary-color);
+	border : 2px solid black;
+	border-radius: 10px;
+}
+
+.elemRankingStatFirst {
+	font-size: 22px;
+	width : 80%;
+	height : 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	background-color : var(--gold-color);
+	border : 2px solid black;
+	border-radius: 10px;
+}
+
+.elemRankingStatSecond {
+	font-size: 22px;
+	width : 80%;
+	height : 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	background-color : var(--silver-color);
+	border : 2px solid black;
+	border-radius: 10px;
+}
+
+.elemRankingStatThird {
+	font-size: 22px;
+	width : 80%;
+	height : 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	background-color : var(--bronze-color);
+	border : 2px solid black;
+	border-radius: 10px;
+}
+
+.elemRankingStat__wrapper {
+	font-size: 22px;
+	width:100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin: 10px 0px;
+	
+}
+
+.elemRankingStat__topNav {
+	font-size: 24px;
+	display: flex;
+}
+
+.elemRankingStat__bottomNav {
+	font-size: 18px;
+	display: flex;
+}
+
+.elemRankingStat {
+	width : 80%;
+	height : 100%;
+	display: flex;
+	justify-content: center;
+}
+
+.elemRankingStat__rank{
+	width : 60px;
+	text-align : center;
+}
+
+.elemRankingStat__elemName{
+	width : 100%;
+	text-align : center;
+}
+
+
+.elemRankingStat__winCount{
+	width : 150px;
+	text-align : center;
+}
+
+
+.elemRankingStat__winRate{
+	width : 150px;
+	text-align : center;
+}
+

@@ -1,0 +1,16 @@
+@font-face {
+font-family: 'CookieRun-Regular';
+src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/CookieRun-Regular.woff') format('woff');
+font-weight: normal;
+font-style: normal;
+}
+
+:root{
+	--primary-color: #CBE2B5;
+	--secondary-color: #E7FBE6;
+	--gold-color: #ffd700;
+	--silver-color: #c0c0c0;
+	--bronze-color: #cd8032;
+	--red-color: #557C55;
+	--green-color: #FA7070;
+}

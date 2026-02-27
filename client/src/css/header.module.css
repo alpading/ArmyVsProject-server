@@ -1,0 +1,22 @@
+.header{
+	font-family: 'CookieRun-Regular';
+	font-size: 20px;
+	text-align: center;
+	height: 50px;
+	display: flex;
+	position: fixed;
+	left: 0;
+	top: 0;
+	justify-content: center;
+	align-items: center;
+	background-color: var(--primary-color);
+	width: 100%;
+}
+.header__title{
+	
+}
+.header__blank{
+	height: 50px;
+	width: 100%;
+	background-color: black;
+}

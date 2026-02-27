@@ -1,0 +1,9 @@
+.shareKakao__button{
+	font-size: 20px;
+	margin-top: 20px;
+	border: 3px solid black;
+	border-radius: 10px;
+	padding: 10px;
+	background-color: #FEE500;
+	color: #191919;
+}
