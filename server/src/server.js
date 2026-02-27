@@ -22,7 +22,7 @@ app.use(
 )
 app.use(httpLogger)
 app.use(express.json())
-app.use(express.static(path.join(__dirname, 'client/build/')))
+app.use(express.static(path.join(__dirname, '../../client/build/')))
 app.use(cookieParser())
 
 //call api middleware
@@ -37,7 +37,7 @@ app.use('/api', (req, res, next) => {
 })
 
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'client/build/index.html'))
+    res.sendFile(path.join(__dirname, '../../client/build/index.html'))
 })
 
 //errorhandling middleware
