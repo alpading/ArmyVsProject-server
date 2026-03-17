@@ -1,5 +1,4 @@
-// const baseUrl = 'https://armyvsproject.com/'
-const baseUrl = 'http://localhost:3000/'
+const baseUrl = '/api'
 
 const maxSelectionPerGame = 10
 

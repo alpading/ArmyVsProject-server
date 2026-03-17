@@ -1,6 +1,6 @@
 import styles from '../css/shareKakao.module.css'
 
-import { shareKakaoImage, baseUrl, reactAppKey } from '../modules/global.js'
+import { reactAppKey } from '../modules/global.js'
 
 
 const { Kakao } = window
